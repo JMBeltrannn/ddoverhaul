@@ -64,13 +64,17 @@ public class Login extends AppCompatActivity {
         blog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 EmailS = Email.getText().toString();
+
                 if(PasswordE.getText().toString().equals("")){
+                    Toast.makeText(Login.this, "Introduce una contraseña por favor", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                PasswordS = PasswordE.getText().toString();
-                signIn(EmailS,PasswordS);
-            }
+                    PasswordS = PasswordE.getText().toString();
+                    signIn(EmailS, PasswordS);
+
+                }
         });
         rgb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,75 +126,74 @@ public class Login extends AppCompatActivity {
     }
 
     private void signIn(String email, String password) {
-        if (email.contains("@")) {
-            // Inicio de sesión utilizando correo electrónico
-            mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            // El inicio de sesión se realizó exitosamente
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            EmailS = user.getEmail();
-                            PasswordS = password;
-                            Log.d("LoginActivity", "Inicio de sesión exitoso: " + user.getEmail());
-                            enter(PasswordS);
-                        } else {
-                            // Ocurrió un error durante el inicio de sesión
-                            Exception exception = task.getException();
-                            String errorMessage = exception.getMessage();
-                            Log.e("LoginActivity", "Error al iniciar sesión: " + errorMessage);
-                            Toast.makeText(Login.this, "Error al iniciar sesión: " + errorMessage, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        } else {
-            // Inicio de sesión utilizando nombre
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            CollectionReference userRef = db.collection("User_Email");
-
-            userRef.whereEqualTo("name", email)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
-                            if (!querySnapshot.isEmpty()) {
-                                DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
-                                String userEmail = documentSnapshot.getString("email");
-
-                                // Iniciar sesión utilizando el correo electrónico obtenido
-                                mAuth.signInWithEmailAndPassword(userEmail, password)
-                                        .addOnCompleteListener(authTask -> {
-                                            if (authTask.isSuccessful()) {
-                                                FirebaseUser currentUser = mAuth.getCurrentUser();
-                                                EmailS = currentUser.getEmail();
-                                                PasswordS = password;
-                                                Log.d("LoginActivity", "Inicio de sesión exitoso: " + currentUser.getEmail());
-                                                enter(PasswordS);
-                                            } else {
-                                                // Ocurrió un error durante el inicio de sesión
-                                                try {
-                                                    Exception exception = authTask.getException();
-                                                    String errorMessage = exception.getMessage();
-                                                    Log.e("LoginActivity", "Error al iniciar sesión: " + errorMessage);
-                                                    Toast.makeText(Login.this, "Error al iniciar sesión: " + errorMessage, Toast.LENGTH_SHORT).show();
-                                                }
-                                                catch (Exception e){
-                                                    Toast.makeText(Login.this, "Error al iniciar sesión: " + e, Toast.LENGTH_SHORT).show();
-                                                }
-
-                                            }
-                                        });
+            if (email.contains("@")) {
+                // Inicio de sesión utilizando correo electrónico
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                // El inicio de sesión se realizó exitosamente
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                EmailS = user.getEmail();
+                                PasswordS = password;
+                                Log.d("LoginActivity", "Inicio de sesión exitoso: " + user.getEmail());
+                                enter(PasswordS);
                             } else {
-                                // No se encontró el nombre en la base de datos
-                                Toast.makeText(Login.this, "No se encontró el nombre en la base de datos", Toast.LENGTH_SHORT).show();
+                                // Ocurrió un error durante el inicio de sesión
+                                Exception exception = task.getException();
+                                String errorMessage = exception.getMessage();
+                                Toast.makeText(Login.this, "Error al iniciar sesión: " + errorMessage, Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            // Ocurrió un error durante la consulta
-                            Exception exception = task.getException();
-                            String errorMessage = exception.getMessage();
-                            Log.e("LoginActivity", "Error en la consulta: " + errorMessage);
-                            Toast.makeText(Login.this, "Error en la consulta a la base de datos", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
+                        });
+            } else {
+                // Inicio de sesión utilizando nombre
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                CollectionReference userRef = db.collection("User_Email");
+
+                userRef.whereEqualTo("name", email)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                QuerySnapshot querySnapshot = task.getResult();
+                                if (!querySnapshot.isEmpty()) {
+                                    DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                                    String userEmail = documentSnapshot.getString("email");
+
+                                    // Iniciar sesión utilizando el correo electrónico obtenido
+                                    mAuth.signInWithEmailAndPassword(userEmail, password)
+                                            .addOnCompleteListener(authTask -> {
+                                                if (authTask.isSuccessful()) {
+                                                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                                                    EmailS = currentUser.getEmail();
+                                                    PasswordS = password;
+                                                    Log.d("LoginActivity", "Inicio de sesión exitoso: " + currentUser.getEmail());
+                                                    enter(PasswordS);
+                                                } else {
+                                                    // Ocurrió un error durante el inicio de sesión
+                                                    try {
+                                                        Exception exception = authTask.getException();
+                                                        String errorMessage = exception.getMessage();
+                                                        Log.e("LoginActivity", "Error al iniciar sesión: " + errorMessage);
+                                                        Toast.makeText(Login.this, "Error al iniciar sesión: " + errorMessage, Toast.LENGTH_SHORT).show();
+                                                    } catch (Exception e) {
+                                                        Toast.makeText(Login.this, "Error al iniciar sesión: " + e, Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                }
+                                            });
+                                } else {
+                                    // No se encontró el nombre en la base de datos
+                                    Toast.makeText(Login.this, "No se encontró el nombre en la base de datos", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                // Ocurrió un error durante la consulta
+                                Exception exception = task.getException();
+                                String errorMessage = exception.getMessage();
+                                Log.e("LoginActivity", "Error en la consulta: " + errorMessage);
+                                Toast.makeText(Login.this, "Error en la consulta a la base de datos", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+
     }
 
     private void goRegister(){

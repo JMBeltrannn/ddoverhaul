@@ -95,7 +95,6 @@ public class BaseActivity extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.lista_hab:
-
                         gohablist();
                         return true;
                     case R.id.lista_obj:
